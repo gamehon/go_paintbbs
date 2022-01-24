@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <link rel="stylesheet" href="neo/dist/neo.css" type="text/css">
+    <script src="neo/dist/neo.js" charset="UTF-8"></script>
+    <script>
+     const params = location.search.substring(1).split('&').reduce((result, query) => {
+       const [k, v] = query.split('=');
+       result[k] = decodeURI(v);
+       return result;
+     }, {});
+     const w = params.w || 500;
+     const h = params.h || 560;
+     const iw = params.iw || 400;
+     const ih = params.ih || 400;
+    </script>
+  </head>
+  <body>
+    <a href="viewer.html">PCH Test</a>
+    <h1>PaintBBS Test</h1>
+
+    <script>
+     document.write(`
+       <applet-dummy name="paintbbs" width="${w}" height="${h}" >
+         <param name="image_width" value="${iw}">
+         <param name="image_height" value="${ih}">
+         <param name="thumbnail_type" value="animation">
+       </applet-dummy>
+
+       <br>
+       <form>
+       <input type="text" name="w" value="${w}"> x
+       <input type="text" name="h" value="${h}"> Applet<br>
+       <input type="text" name="iw" value="${iw}"> x
+       <input type="text" name="ih" value="${ih}"> Canvas<br>
+       <input type="reset" value="RESET"><br>
+       <input type="submit" value="RELOAD">
+       </form>
+     `)
+
+     document.paintBBSCallback = function (str) {
+       /*if (str === 'check') {
+         const image = Neo.painter.getImage();
+         const animation = Neo.painter.getThumbnail('animation');
+         
+         const img = document.createElement('img');
+         img.src = image.toDataURL('image/png');
+         img.className = "sample";
+
+         const a = document.createElement('a');
+         a.href= URL.createObjectURL(animation);
+         a.innerHTML = a.download = (new Date() - 0) + ".pch";
+
+         const top = document.querySelector('img.sample')
+         document.body.insertBefore(img, top);
+         document.body.insertBefore(a, top);
+         return false;
+       }*/
+       if (str === 'check') {
+         return false;
+       }
+
+       var cmds = String(str).split(".");
+
+       if (cmds.length>1) {
+          var filename = String(str);
+          const img = document.createElement('img');
+          img.src = "/gallery/"+filename;
+          img.className = "sample";
+
+          const a = document.createElement('a');
+          a.href= "/gallery/"+filename;
+          a.innerHTML = a.download = filename;
+
+          const top = document.querySelector('img.sample')
+          document.body.insertBefore(img, top);
+          document.body.insertBefore(a, top);
+       }
+     }
+    </script>
+    <br>
+    
+    <style>
+      img.sample {
+        border: 1px solid black;
+        margin-bottom: 5px;
+        display: block;
+      }
+      input {
+        width: 100px;
+      }
+      #pageView {
+        margin: 0 !important;
+      }
+    </style>
+    {{range .}}
+      <img class="sample" src="/gallery/{{.Name}}">
+      <a href="/gallery/{{.Name}}" download="{{.Name}}">{{.Name}}</a>
+    </div>
+    {{end}}
+  </body>
+</html>
