@@ -10,6 +10,8 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+
+	"github.com/gorilla/mux"
 )
 
 type ByModTime []os.FileInfo
@@ -47,7 +49,10 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/", index)
+	r := mux.NewRouter()
+	r.HandleFunc("/", index)
+	r.HandleFunc("/{key}", index)
+	http.Handle("/", r)
 	http.HandleFunc("/save/", uploadsHandler)
 	http.Handle("/neo/", http.StripPrefix("/neo/", http.FileServer(http.Dir("./neo"))))
 	http.Handle("/gallery/", http.StripPrefix("/gallery/", http.FileServer(http.Dir("./gallery"))))
@@ -56,6 +61,20 @@ func main() {
 }
 
 func index(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
+	key, ok := vars["key"]
+	if ok {
+		if key == "viewer.html" {
+			tpl.ExecuteTemplate(w, "viewer.html", nil)
+			return
+		} else if key == "index.html" {
+
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}
+
 	file, err := os.Open("gallery")
 	checkError(err)
 	defer file.Close()
@@ -105,6 +124,7 @@ func uploadsHandler(w http.ResponseWriter, req *http.Request) {
 		mf.Seek(0, 0)
 		io.Copy(nf, mf)
 
+		// response file name : json
 		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		fileres := FileRes{fname}

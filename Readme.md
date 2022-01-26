@@ -1,6 +1,7 @@
 GO paintbbs
 
 - PaintBBS NEO : https://github.com/funige/neo
+- しぃローカル PaintBBS : https://github.com/satopian/shi-local-PaintBBS
 
 paintbbs + golang
 
